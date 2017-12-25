@@ -1,0 +1,11 @@
+type Channel {
+  id: ID!
+  name: String!
+  messages: [Message!]!
+  public: Boolean
+}
+
+type Mutation {
+  createChannel(teamId: ID!, name: String!, public: Boolean=false): Boolean!
+  deleteChannel(id: ID!): Boolean!
+}

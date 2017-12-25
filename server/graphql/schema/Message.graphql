@@ -1,0 +1,10 @@
+type Message {
+  id: ID!
+  text: String!
+  user: ID!
+  channel: ID!
+}
+
+type Mutation {
+  createMessage(channelId: ID!, text: String!): Boolean!
+}

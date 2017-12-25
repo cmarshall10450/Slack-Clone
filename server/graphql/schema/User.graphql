@@ -1,0 +1,17 @@
+type User {
+  id: ID!
+  username: String!
+  email: String!
+  teams: [Team!]!
+}
+
+type Query {
+  users: [User!]!
+  getUserById(id: ID!): User!
+  getUserByUsername(username: String): User!
+}
+
+type Mutation {
+  createUser (username: String!, email: String!, password: String!): User!
+  deleteUser (id: ID!): Boolean!
+}

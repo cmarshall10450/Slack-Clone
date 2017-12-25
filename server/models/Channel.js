@@ -1,25 +1,19 @@
 import mongoose, { Schema, mongo } from 'mongoose'
+import validate from 'mongoose-validator'
 
 const Channel = new Schema({
   name: {
     type: String,
     required: true,
-    validate: [
-      validate({
-        validator: 'isAlphanumeric',
-        message: 'Channel name can only consist of letters and numbers.',
-      }),
-    ],
   },
   team: {
     type: Schema.Types.ObjectId,
     ref: 'Team',
   },
-  members: [
+  messages: [
     {
       type: Schema.Types.ObjectId,
-      default: [],
-      ref: 'User',
+      ref: 'Message',
     },
   ],
   public: {

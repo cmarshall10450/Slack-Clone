@@ -1,4 +1,5 @@
 import mongoose, { Schema, mongo } from 'mongoose'
+import validate from 'mongoose-validator'
 
 const Team = new Schema({
   name: {
@@ -23,6 +24,21 @@ const Team = new Schema({
       ref: 'User',
     },
   ],
+  channels: [
+    {
+      type: Schema.Types.ObjectId,
+      default: [],
+      ref: 'Channel',
+    },
+  ],
 })
 
-export default mongoose.model('User', User)
+Team.statics.addChannel = function(id, channel) {
+  return this.findByIdAndUpdate(id, { $push: { channels: channel } })
+}
+
+Team.statics.addMember = function(id, member) {
+  return this.findByIdAndUpdate(id, { $push: { members: member } })
+}
+
+export default mongoose.model('Team', Team)
