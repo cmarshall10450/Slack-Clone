@@ -14,6 +14,9 @@ import resolvers from './graphql/resolvers'
 const PORT = 5000
 const MONGO_URI = 'mongodb://localhost/slack'
 
+const SECRET = 'ojdfnkblsdfznblaefjhbneofjlsdmfhbnl'
+const SECRET2 = 'jsoflblsdjfhboefhbiekfbjjasfnausjlf'
+
 export const schema = makeExecutableSchema({
   typeDefs,
   resolvers,
@@ -35,6 +38,8 @@ app.use(
       user: {
         id: '5a40ed64ea9c76358029110b',
       },
+      SECRET,
+      SECRET2,
     },
   })
 )

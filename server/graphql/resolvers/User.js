@@ -1,4 +1,6 @@
 import { model } from 'mongoose'
+import formatErrors from '../../formatErrors'
+import { tryLogin } from '../../auth'
 
 export default {
   Query: {
@@ -8,8 +10,22 @@ export default {
       models.User.findOne({ username }),
   },
   Mutation: {
-    createUser: async (parent, args, { models }) =>
-      await new models.User(args).save(),
+    register: async (parent, args, { models }) => {
+      try {
+        const user = await new models.User(args).save()
+        return {
+          ok: true,
+          user,
+        }
+      } catch (err) {
+        return {
+          ok: false,
+          errors: formatErrors(err),
+        }
+      }
+    },
+    login: (parent, { email, password }, { models, SECRET, SECRET2 }) =>
+      tryLogin(email, password, models, SECRET, SECRET2),
     deleteUser: async (parent, { id }, { models }) => {
       try {
         await models.User.findByIdAndRemove(id)
