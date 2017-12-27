@@ -6,12 +6,6 @@ const Team = new Schema({
     type: String,
     unique: true,
     required: true,
-    validate: [
-      validate({
-        validator: 'isAlphanumeric',
-        message: 'Team name must only consist of letters and numbers.',
-      }),
-    ],
   },
   owner: {
     type: Schema.Types.ObjectId,
