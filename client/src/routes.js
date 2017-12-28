@@ -1,7 +1,7 @@
 import React from 'react'
 import decode from 'jwt-decode'
 import { BrowserRouter, Route, Switch, Redirect } from 'react-router-dom'
-import { Home, Register, Login, CreateTeam } from './pages'
+import { Home, Register, Login, CreateTeam, ViewTeam } from './pages'
 
 const isAuthenticated = () => {
   const token = localStorage.getItem('token')
@@ -40,6 +40,11 @@ const Routes = () => (
       <Route exact path="/register" component={Register} />
       <Route exact path="/login" component={Login} />
       <PrivateRoute exact path="/create-team" component={CreateTeam} />
+      <PrivateRoute
+        exact
+        path="/view-team/:teamId?/:channelId?"
+        component={ViewTeam}
+      />
     </Switch>
   </BrowserRouter>
 )

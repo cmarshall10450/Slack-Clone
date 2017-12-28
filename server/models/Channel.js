@@ -18,7 +18,7 @@ const Channel = new Schema({
   ],
   public: {
     type: Boolean,
-    default: false,
+    default: true,
   },
 })
 

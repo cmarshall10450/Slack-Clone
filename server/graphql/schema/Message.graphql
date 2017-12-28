@@ -1,8 +1,8 @@
 type Message {
   id: ID!
   text: String!
-  user: ID!
-  channel: ID!
+  user: User!
+  channel: Channel!
 }
 
 type Mutation {

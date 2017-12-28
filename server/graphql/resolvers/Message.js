@@ -1,4 +1,10 @@
 export default {
+  Message: {
+    user: ({ id }, args, { models }) =>
+      models.Message.findById(id)
+        .populate('user')
+        .then(message => messages.user),
+  },
   Mutation: {
     createMessage: async (parent, { channelId, text }, { models, user }) => {
       try {
