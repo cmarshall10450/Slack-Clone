@@ -5,8 +5,11 @@ import cors from 'cors'
 import bodyParser from 'body-parser'
 import jwt from 'jsonwebtoken'
 import Promise from 'bluebird'
+import { createServer } from 'http'
 import { makeExecutableSchema } from 'graphql-tools'
 import { graphqlExpress, graphiqlExpress } from 'apollo-server-express'
+import { execute, subscribe } from 'graphql'
+import { SubscriptionServer } from 'subscriptions-transport-ws'
 import { refreshTokens } from './auth'
 
 import models from './models'
@@ -72,14 +75,35 @@ app.use(
   }))
 )
 
-app.use('/graphiql', graphiqlExpress({ endpointURL: graphqlEndpoint }))
+app.use(
+  '/graphiql',
+  graphiqlExpress({
+    endpointURL: graphqlEndpoint,
+    subscriptionsEndpoint: `ws://localhost:${PORT}/subscriptions`,
+  })
+)
+
+const server = createServer(app)
 
 mongoose.Promise = Promise
 mongoose.connect(MONGO_URI, { useMongoClient: true }).then(
   () => {
     console.log('Connected to DB')
     console.log('Starting server...')
-    app.listen(PORT, () => console.log('Server running on port:', PORT))
+    server.listen(PORT, () => {
+      console.log(`Server running on port ${PORT}`)
+      new SubscriptionServer(
+        {
+          execute,
+          subscribe,
+          schema,
+        },
+        {
+          server,
+          path: '/subscriptions',
+        }
+      )
+    })
   },
   err => {
     console.log(err)

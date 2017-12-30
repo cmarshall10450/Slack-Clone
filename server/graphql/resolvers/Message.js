@@ -1,28 +1,63 @@
+import { PubSub, withFilter } from 'graphql-subscriptions'
+
+import { requiresAuth } from '../../permissions'
+
+const pubsub = new PubSub()
+
+const NEW_CHANNEL_MESSAGE = 'NEW_CHANNEL_MESSAGE'
+
 export default {
+  Subscription: {
+    newChannelMessage: {
+      subscribe: withFilter(
+        () => pubsub.asyncIterator(NEW_CHANNEL_MESSAGE),
+        (payload, args) => payload.channelId === args.channelId
+      ),
+    },
+  },
   Message: {
-    user: ({ id }, args, { models }) =>
-      models.Message.findById(id)
+    user: async (parent, args, { models }) =>
+      await models.Message.findById(parent.id)
         .populate('user')
-        .then(message => messages.user),
+        .then(message => message.user),
+  },
+  Query: {
+    messages: requiresAuth.createResolver(
+      async (parent, { channelId }, { models }) =>
+        models.Message.find({ channel: channelId }).sort({ createdAt: 1 })
+    ),
   },
   Mutation: {
-    createMessage: async (parent, { channelId, text }, { models, user }) => {
-      try {
-        const message = await new models.Message({
-          text,
-          channel: channelId,
-          user: user.id,
-        }).save()
+    createMessage: requiresAuth.createResolver(
+      async (parent, { channelId, text }, { models, user }) => {
+        try {
+          const message = await models
+            .Message({
+              channel: channelId,
+              text,
+              user: user.id,
+            })
+            .save()
 
-        await models.Channel.findByIdAndUpdate(channelId, {
-          $push: { messages: message },
-        })
+          const asyncFunc = async () => {
+            const currentUser = await models.User.findById(user.id)
 
-        return true
-      } catch (err) {
-        console.log(err)
-        return false
+            pubsub.publish(NEW_CHANNEL_MESSAGE, {
+              channelId: channelId,
+              newChannelMessage: {
+                ...message.toObject(),
+              },
+            })
+          }
+
+          asyncFunc()
+
+          return true
+        } catch (err) {
+          console.log(err)
+          return false
+        }
       }
-    },
+    ),
   },
 }
