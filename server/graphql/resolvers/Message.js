@@ -39,15 +39,13 @@ export default {
 
           const asyncFunc = async () => {
             const currentUser = (await models.User.findById(user.id)).toObject();
-            const a = message.toObject();
+            const messageObject = message.toObject();
             pubsub.publish(NEW_CHANNEL_MESSAGE, {
               channelId: channelId,
               newChannelMessage: {
-                __typename: 'Message',
-                ...a,
-                id: a._id,
+                ...messageObject,
+                id: messageObject._id,
                 user: {
-                  __typename: 'User',
                   ...currentUser,
                 }
               },
