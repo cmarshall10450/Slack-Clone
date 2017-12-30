@@ -31,13 +31,11 @@ export default {
     createMessage: requiresAuth.createResolver(
       async (parent, { channelId, text }, { models, user }) => {
         try {
-          const message = await models
-            .Message({
-              channel: channelId,
-              text,
-              user: user.id,
-            })
-            .save()
+          const message = await new models.Message({
+            channel: channelId,
+            text,
+            user: user.id,
+          }).save()
 
           const asyncFunc = async () => {
             const currentUser = await models.User.findById(user.id)
