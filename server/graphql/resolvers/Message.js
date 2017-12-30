@@ -16,8 +16,8 @@ export default {
     },
   },
   Message: {
-    user: async (parent, args, { models }) =>
-      await models.Message.findById(parent.id)
+    user: (parent, args, { models }) =>
+      parent.user && parent.user.username ? parent.user : models.Message.findById(parent.id)
         .populate('user')
         .then(message => message.user),
   },
@@ -38,12 +38,16 @@ export default {
           }).save()
 
           const asyncFunc = async () => {
-            const currentUser = await models.User.findById(user.id)
-
+            const currentUser = (await models.User.findById(user.id)).toObject();
+            const messageObject = message.toObject();
             pubsub.publish(NEW_CHANNEL_MESSAGE, {
               channelId: channelId,
               newChannelMessage: {
-                ...message.toObject(),
+                ...messageObject,
+                id: messageObject._id,
+                user: {
+                  ...currentUser,
+                }
               },
             })
           }

@@ -23,7 +23,7 @@ class MessageContainer extends Component {
 
         return {
           ...prev,
-          messages: [...prev.messages, subscriptionData.newChannelMessage],
+          messages: [...prev.messages, subscriptionData.data.newChannelMessage],
         }
       },
     })
